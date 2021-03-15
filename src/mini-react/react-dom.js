@@ -23,34 +23,31 @@ function updateHostComponent(workInProgress) {
     workInProgress.stateNode = createNode(workInProgress);
   }
   reconcileChilren(workInProgress, props.children);
-  console.log('workInProgress: ', workInProgress);
 }
 
 function updateNode(node, nextVal) {
   Object.keys(nextVal).forEach((k) => {
     if (k === 'children') {
-      if(typeof nextVal[k] === 'string'){
+      if (typeof nextVal[k] === 'string') {
         node.textContent = nextVal[k];
-      }      
+      }
     } else {
       node[k] = nextVal[k];
     }
   });
 }
 
-function updateClassComponent(vnode) {
-  const { type, props } = vnode;
+function updateClassComponent(workInProgress) {
+  const { type, props } = workInProgress;
   const instance = new type(props);
-  const vvnode = instance.render();
-  const node = createNode(vvnode);
-  return node;
+  const children = instance.render();
+  reconcileChilren(workInProgress, children);
 }
 
-function updateFunctionComponent(vnode) {
-  const { type, props } = vnode;
-  const vvnode = type(props);
-  const node = createNode(vvnode);
-  return node;
+function updateFunctionComponent(workInProgress) {
+  const { type, props } = workInProgress;
+  const children = type(props);
+  reconcileChilren(workInProgress, children);
 }
 
 function reconcileChilren(workInProgress, children) {
@@ -69,6 +66,11 @@ function reconcileChilren(workInProgress, children) {
       sibling: null,
       return: workInProgress
     };
+
+    if(typeof child === 'string'){
+      newFiber.props = child;
+    }
+
     if (i === 0) {
       workInProgress.child = newFiber;
     } else {
@@ -78,9 +80,10 @@ function reconcileChilren(workInProgress, children) {
   }
 }
 
-function updateTextComponent(vnode) {
-  const node = document.createTextNode(vnode);
-  return node;
+function updateTextComponent(workInProgress) {
+  if(!workInProgress.stateNode){
+    workInProgress.stateNode = document.createTextNode(workInProgress.props)
+  }
 }
 
 let nextUnitOfWork = null;
@@ -90,7 +93,16 @@ function performanceUnitOfWork(workInProgress) {
 
   if (typeof type === 'string') {
     updateHostComponent(workInProgress);
+  } else if (typeof type === 'function') {
+    if(type.prototype.isReactComponent){
+      updateClassComponent(workInProgress)
+    }else{
+      updateFunctionComponent(workInProgress);
+    }
+  }else{
+    updateTextComponent(workInProgress)
   }
+
   if (workInProgress.child) {
     return workInProgress.child;
   }
@@ -126,6 +138,11 @@ function commitWork(workInProgress) {
 
   let parentNodeFiber = workInProgress.return;
   let parentNode = parentNodeFiber.stateNode;
+  while(!parentNode){
+    parentNodeFiber = parentNodeFiber.return;
+    parentNode = parentNodeFiber.stateNode;
+  }
+
   if (workInProgress.stateNode) {
     parentNode.appendChild(workInProgress.stateNode);
   }

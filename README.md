@@ -85,6 +85,34 @@ react/packages/scheduler/src/forks/ScheduleHostConfig.default.js
 
 ### fiber链表结构
 
+## Hook 解决了什么问题
+Hook解决了我们五年来编写和维护成千上万的组件时遇到的各种各样看起来不相关的问题。
+### 在组件之间复用状态逻辑很难
+React没有提供将可复用性行为“附加”到组件的途径（例如，把组件连接到store）。如果你使用过React一段时间，你也许会熟悉一些解决此类问题的方案，比如render props和高阶组件。但是这类方案需要重新组织你的组件结构，这可能会很麻烦，使你的代码难以理解。如果你在React DevTools中观察过React应用，你会发现由providers,consumers,高阶组件，render props等其他抽象层组成的组件会形成“嵌套地狱”。尽管我们可以在DevTools过滤掉它们，但这说明了一个更深层次的问题：React需要为共享状态逻辑提供更好的原生途径。
+
+你可以使用Hook从组件中提取状态逻辑，使得这些逻辑可以单独测试并服用。Hook使你在无需修改组件结构的情况下复用状态逻辑。这使得在组件间或社区内共享Hook变得便捷。
+### Hook API
+- 基础的Hook
+
+  - useState
+
+  - useEffect
+
+  - useContext
+
+- 额外的Hook
+  - useReducer
+
+  - useCallback
+
+  - useMemo
+
+  - useRef
+
+  - useImperativeHandle
+
+  - useLayoutEffect
+
 
 
 
