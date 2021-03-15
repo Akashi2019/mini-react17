@@ -27,11 +27,6 @@ babel-loader会编译JSX为React.createElement(...)
 ## React17 原理
 React17中的JSX转换不会将JSX转换为React.createElement(...),而是自动从React的package中引入新的入口函数并调用。JSX语法没有改变，可以继续工作
 
-## 环境搭建
-npm install webpack webpack-cli -D
-npm install @babel/core @babel/preset-env babel-loader -D
-npm install @babel/plugin-transform-react-jsx -D
-
 ## fiber架构
 ### reconciliation协调
 #### 设计动力
